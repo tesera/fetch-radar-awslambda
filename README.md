@@ -6,7 +6,7 @@ AWS Lambda function to fetch radar images periodically from weather.gc.ca. The f
 
 1. Create a lambda function through the AWS Console.
 2. Configure the lambda function to run daily.
-3. Copy `sample.env` to `.env` and set the target bucket name inside.
+3. Copy `sample.env` to `.env` and set the target bucket name and desired sites inside.
 4. Run the deploy script in this repository: `./deploy.sh`
 
 ## Usage
