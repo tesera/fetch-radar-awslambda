@@ -1,6 +1,6 @@
 #!/bin/sh
 
-zip -r function.zip radar.py
+zip -r function.zip radar.py lib
 
 aws lambda update-function-code \
 --function-name fetch-radar \
