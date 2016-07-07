@@ -22,7 +22,7 @@ def transfer_images(images, bucket):
         # regex operates on: "/lib/radar/image.php?time=01-JAN-16+12.20.46.889824+AM&site=NAT"
         results = re.search(r'image\.php\?time=([0-9]{2})-([A-Z]*)-([0-9]{2})\+([0-9]{2})\.([0-9]{2})\.([0-9]{2}).*$', image)
         day, month, year, hour, minute = (results.group(1), results.group(2), results.group(3), results.group(4), results.group(5))
-        result = s3.Object('weather-radar', 'radar-%(year)s-%(month)s-%(day)s_%(hour)s.%(minute)s.gif' % locals()).put(Body=urllib2.urlopen('http://climate.weather.gc.ca%(image)s' % locals(), 'rb').read())
+        result = s3.Object('weather-radar', 'radar-%(year)s-%(month)s-%(day)s_%(hour)s_%(minute)s.gif' % locals()).put(Body=urllib2.urlopen('http://climate.weather.gc.ca%(image)s' % locals(), 'rb').read())
         uploads.append(result['ResponseMetadata']['HTTPStatusCode'])
     return all(r == 200 for r in uploads)
 
