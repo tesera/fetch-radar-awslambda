@@ -8,8 +8,6 @@ import datetime
 import boto3
 from dateutil.parser import parse
 from joblib import Parallel, delayed
-
-sys.path.append(os.getcwd()+"/lib")
 from dotenv import load_dotenv, find_dotenv
 
 s3 = boto3.resource('s3')
