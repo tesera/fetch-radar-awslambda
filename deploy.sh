@@ -2,7 +2,7 @@
 
 [ ! -f .env ] && cp sample.env .env
 
-zip -r function.zip radar.py lib
+zip -r function.zip radar.py lib .env
 
 aws lambda update-function-code \
 --function-name fetch-radar \

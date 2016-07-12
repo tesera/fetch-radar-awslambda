@@ -3,9 +3,12 @@ import re
 import urllib2
 import datetime
 import boto3
+import sys
 from multiprocessing import Pool
 from dateutil.parser import parse
-from lib.dotenv import load_dotenv, find_dotenv
+
+sys.path.append(os.getcwd()+"/lib")
+from dotenv import load_dotenv, find_dotenv
 
 s3 = boto3.resource('s3')
 load_dotenv(find_dotenv())
