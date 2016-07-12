@@ -14,6 +14,14 @@ from dotenv import load_dotenv, find_dotenv
 
 s3 = boto3.resource('s3')
 load_dotenv(find_dotenv())
+image_types = ['PRECIPET_SNOW_WEATHEROFFICE',
+               'PRECIPET_SNOW_A11Y_WEATHEROFFICE',
+               'PRECIPET_RAIN_WEATHEROFFICE',
+               'PRECIPET_RAIN_A11Y_WEATHEROFFICE',
+               'COMP_PRECIPET_SNOW_WEATHEROFFICE',
+               'COMP_PRECIPET_SNOW_A11Y_WEATHEROFFICE',
+               'COMP_PRECIPET_RAIN_WEATHEROFFICE',
+               'COMP_PRECIPET_RAIN_A11Y_WEATHEROFFICE']
 
 def lambda_handler(event, context):
     bucket = os.environ['BUCKET']
@@ -26,9 +34,10 @@ def process_site(args):
     site, date, bucket = args
     print "Processing %(site)s: %(date)s" % locals()
     t = date - datetime.timedelta(days=1)
-    morning_urls = get_image_urls(site, t.year, t.month, t.day, '00', '00', 12)
-    evening_urls = get_image_urls(site, t.year, t.month, t.day, '12', '00', 12)
-    return transfer_images(site, morning_urls + evening_urls, bucket)
+    morning_urls = [get_image_urls(site, image_type, t.year, t.month, t.day, '00', '00', 12) for image_type in image_types]
+    evening_urls = [get_image_urls(site, image_type, t.year, t.month, t.day, '12', '00', 12) for image_type in image_types]
+    url_list = [url for url_list in morning_urls + evening_urls for url in url_list]
+    return transfer_images(site, url_list, bucket)
 
 def transfer_images(site, images, bucket):
     uploads = []
@@ -42,8 +51,8 @@ def transfer_images(site, images, bucket):
         uploads.append(result['ResponseMetadata']['HTTPStatusCode'])
     return { site: all(r == 200 for r in uploads)}
 
-def get_image_urls(site, year, month, day, hour, minute, duration):
-    url = "http://climate.weather.gc.ca/radar/index_e.html?site=%(site)s&year=%(year)i&month=%(month)i&day=%(day)i&hour=%(hour)s&minute=%(minute)s&duration=%(duration)i&image_type=PRECIPET_RAIN_WEATHEROFFICE" % locals()
+def get_image_urls(site, image_type, year, month, day, hour, minute, duration):
+    url = "http://climate.weather.gc.ca/radar/index_e.html?site=%(site)s&year=%(year)i&month=%(month)i&day=%(day)i&hour=%(hour)s&minute=%(minute)s&duration=%(duration)i&image_type=%(image_type)s" % locals()
     html = urllib2.urlopen(url).read()
     results = re.search(r'^\s*blobArray\s*=\s*(\[.*?\])\s*,\s*$', html, flags=re.DOTALL | re.MULTILINE)
     if results is None: return [None]
