@@ -36,18 +36,19 @@ def process_site(args):
     t = date - datetime.timedelta(days=1)
     morning_urls = [get_image_urls(site, image_type, t.year, t.month, t.day, '00', '00', 12) for image_type in image_types]
     evening_urls = [get_image_urls(site, image_type, t.year, t.month, t.day, '12', '00', 12) for image_type in image_types]
-    url_list = [url for url_list in morning_urls + evening_urls for url in url_list]
+    url_list = sum(morning_urls + evening_urls, [])
     return transfer_images(site, url_list, bucket)
 
 def transfer_images(site, images, bucket):
     uploads = []
     images = [image for image in images if image]
     for image in images:
-        print "Downloading %(image)s" % locals()
+        print "Downloading %(url)s (%(type)s)" % image
+        image_type = image['type']
         # regex operates on: "/lib/radar/image.php?time=01-JAN-16+12.20.46.889824+AM&site=NAT"
-        results = re.search(r'image\.php\?time=([0-9]{2})-([A-Z]*)-([0-9]{2})\+([0-9]{2})\.([0-9]{2})\.([0-9]{2}).*$', image)
-        day, month, year, hour, minute = (results.group(1), results.group(2), results.group(3), results.group(4), results.group(5))
-        result = s3.Object('weather-radar', 'radar-%(site)s-%(year)s-%(month)s-%(day)s_%(hour)s_%(minute)s.gif' % locals()).put(Body=urllib2.urlopen('http://climate.weather.gc.ca%(image)s' % locals(), 'rb').read())
+        results = re.search(r'image\.php\?time=([0-9]{2})-([A-Z]*)-([0-9]{2})\+([0-9]{2})\.([0-9]{2})\.([0-9]{2}).*$', image['url'])
+        year, month, day, hour, minute = (results.group(1), results.group(2), results.group(3), results.group(4), results.group(5))
+        result = s3.Object('weather-radar', 'radar-%(site)s-%(image_type)s-%(year)s-%(month)s-%(day)s_%(hour)s_%(minute)s.gif' % locals()).put(Body=urllib2.urlopen('http://climate.weather.gc.ca%(url)s' % image, 'rb').read())
         uploads.append(result['ResponseMetadata']['HTTPStatusCode'])
     return { site: all(r == 200 for r in uploads)}
 
@@ -64,5 +65,5 @@ def get_image_urls(site, image_type, year, month, day, hour, minute, duration):
     for image in re.findall(pattern, js):
         images.append(image)
 
-    return images[:12]
+    return [{ 'type': image_type, 'url': image } for image in images[:12]]
 
