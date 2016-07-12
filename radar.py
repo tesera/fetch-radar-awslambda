@@ -5,7 +5,7 @@ import datetime
 import boto3
 from multiprocessing import Pool
 from dateutil.parser import parse
-from lib.dotenv.dotenv import load_dotenv, find_dotenv
+from lib.dotenv import load_dotenv, find_dotenv
 
 s3 = boto3.resource('s3')
 load_dotenv(find_dotenv())
