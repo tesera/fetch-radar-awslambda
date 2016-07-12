@@ -41,7 +41,7 @@ def transfer_images(site, images, bucket):
         # result = s3.Object('weather-radar', 'radar-%(site)s-%(year)s-%(month)s-%(day)s_%(hour)s_%(minute)s.gif' % locals()).put(Body=urllib2.urlopen('http://climate.weather.gc.ca%(image)s' % locals(), 'rb').read())
         # uploads.append(result['ResponseMetadata']['HTTPStatusCode'])
         uploads.append(200)
-    return all(r == 200 for r in uploads)
+    return { site: all(r == 200 for r in uploads)}
 
 def get_image_urls(site, year, month, day, hour, minute, duration):
     url = "http://climate.weather.gc.ca/radar/index_e.html?site=%(site)s&year=%(year)i&month=%(month)i&day=%(day)i&hour=%(hour)s&minute=%(minute)s&duration=%(duration)i&image_type=PRECIPET_RAIN_WEATHEROFFICE" % locals()
