@@ -17,20 +17,23 @@ exports.handler = function(event, context) {
     console.log('Time:  ', event['time']);
 };
 
-exports.getImageURLs = function(site, type, datetime, cb) {
+exports.getImageURLs = function(site, type, datetime) {
     var duration = 12;
+    var imageListURL = `http://climate.weather.gc.ca/radar/index_e.html?site=${site}&year=${datetime.getFullYear()}&month=${datetime.getMonth()}&day=${datetime.getDate()}&hour=${datetime.getHours()}&minute=${datetime.getMinutes()}&duration=${duration}&image_type=${type}`
 
-    imageListURL = `http://climate.weather.gc.ca/radar/index_e.html?site=${site}&year=${datetime.getFullYear()}&month=${datetime.getMonth()}&day=${datetime.getDate()}&hour=${datetime.getHours()}&minute=${datetime.getMinutes()}&duration=${duration}&image_type=${type}`
-    request(imageListURL, (error, response, body) => {
-        if(!error && response.statusCode == 200) {
-            var re = /^\s*blobArray = \[([\s\S]*)\],$/gm;
-            var blobArray = re.exec(body)[1]
-                .split('\n')
-                .filter((s) => { return !s.match(/^\s+$/); })
-                .map((s) => { return /s*'(.*)',/.exec(s)[1]; });
-            cb(blobArray);
-        } else {
-            cb(null, response);
-        }
+    return new Promise((resolve, reject) => {
+        request(imageListURL, (error, response, body) => {
+            if(error) reject(error);
+            if(response.statusCode !== 200) reject("Unsuccessful response from server");
+            if(!error && response.statusCode == 200) {
+                var re = /^\s*blobArray = \[([\s\S]*)\],$/gm;
+                var blobArray = re.exec(body)[1]
+                    .split('\n')
+                    .filter((s) => { return !s.match(/^\s+$/); })
+                    .map((s) => { return /s*'(.*)',/.exec(s)[1]; });
+                resolve(blobArray);
+            }
+
+        });
     });
 };

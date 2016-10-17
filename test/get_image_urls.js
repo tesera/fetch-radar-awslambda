@@ -25,13 +25,11 @@ describe('getImageURLs()', () => {
             '/lib/radar/image.php?time=17-OCT-15+10.10.29.481384+PM&site=WUJ',
         ];
 
-        lambda.getImageURLs(site, type, datetime, (actual, err) => {
-            if (err) done(err);
-            else
-            {
+        lambda.getImageURLs(site, type, datetime)
+            .then((actual) => {
                 assert.deepEqual(expected, actual);
                 done();
-            }
-        });
+            })
+            .catch(done);
     });
 });
