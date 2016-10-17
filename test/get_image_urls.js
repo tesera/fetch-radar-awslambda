@@ -7,7 +7,7 @@ describe('getImageURLs()', () => {
     var type = 'PRECIPET_SNOW_WEATHEROFFICE'
     var datetime = new Date(2015,10,17,10);
 
-    it('returns the correct data', (done) => {
+    it('finds and returns the image URLs', (done) => {
 
         var expected = [
             '/lib/radar/image.php?time=17-OCT-15+10.10.35.793302+AM&site=WUJ',
