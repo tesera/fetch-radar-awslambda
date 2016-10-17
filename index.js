@@ -3,7 +3,12 @@ var AWS = require('aws-sdk');
 require('node-env-file')('.env');
 
 exports.handler = function(event, context) {
-    console.log('Lambda Event: %j', event);
-    console.log('Sites: ', process.env.SITES);
-    console.log('Types: ', process.env.TYPES);
+
+    bucket = process.env.BUCKET;
+    sites = process.env.SITES.split(',');
+    types = process.env.TYPES.split(',');
+
+    console.log('Sites: ', sites);
+    console.log('Types: ', types);
+    console.log('Time:  ', event['time']);
 };
