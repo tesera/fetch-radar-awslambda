@@ -30,6 +30,7 @@ describe('getImageURLs()', () => {
             else
             {
                 assert.deepEqual(expected, actual);
+                done();
             }
         });
     });

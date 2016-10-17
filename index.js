@@ -33,5 +33,4 @@ exports.getImageURLs = function(site, type, datetime, cb) {
             cb(null, response);
         }
     });
-    // console.log(site, type, datetime);
 };
