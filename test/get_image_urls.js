@@ -2,12 +2,12 @@ const assert = require('assert');
 const lambda = require('../index');
 
 
-describe('getImageURLs()', () => {
+describe('getImageURLs()', function() {
     var site = 'WUJ';
     var type = 'PRECIPET_SNOW_WEATHEROFFICE'
     var datetime = new Date(2015,10,17,10);
 
-    it('finds and returns the image URLs', (done) => {
+    it('finds and returns the image URLs', function(done) {
 
         var expected = [
             '/lib/radar/image.php?time=17-OCT-15+10.10.35.793302+AM&site=WUJ',
