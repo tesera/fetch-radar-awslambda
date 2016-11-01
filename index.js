@@ -31,7 +31,8 @@ exports.getImageURLs = function(site, type, datetime) {
                 var blobArray = re.exec(body)[1]
                     .split('\n')
                     .filter((s) => { return !s.match(/^\s+$/); })
-                    .map((s) => { return /s*'(.*)',/.exec(s)[1]; });
+                    .map((s) => { return /s*'(.*)',/.exec(s)[1]; })
+                    .map((url) => { return {type: type, image: url}; })
                 resolve(blobArray);
             }
         });
