@@ -10,6 +10,10 @@ describe('transferImage()', function() {
         var expected = null;
         this.timeout(0);
 
+        lambda.getS3 = function() {
+            return { putObject: function(args, cb) { cb(null, {ETag: 'asdfasfd'}); } }
+        };
+
         lambda.transferImage(image_obj.image, bucket, 'test/WUJ-PRECIPET_SNOW_WEATHEROFFICE-17OCT15_12.23.33').then((actual) => {
             if('ETag' in actual) done();
             else done("ETag was not returned from S3");

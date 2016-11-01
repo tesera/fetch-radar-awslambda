@@ -64,7 +64,7 @@ exports.transferImage = function(image_url, bucket, filename) {
     var image_url = `http://climate.weather.gc.ca${image_url}`;
     return new Promise((resolve, reject) => {
         request(image_url, (error, response, body) => {
-            S3.putObject({
+            exports.getS3().putObject({
                 Bucket: bucket,
                 Key: filename,
                 Body: body
@@ -75,3 +75,8 @@ exports.transferImage = function(image_url, bucket, filename) {
         });
     });
 };
+
+exports.getS3 = function() {
+    return S3;
+};
+
