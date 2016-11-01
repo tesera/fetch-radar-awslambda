@@ -4,7 +4,12 @@ const http = require('http');
 const request = require('request');
 const S3 = new AWS.S3();
 
-require('node-env-file')('.env');
+try {
+    require('node-env-file')('.env');
+} catch(err) {
+    if(err instanceof TypeError && err.message.substring(0,30) == "Environment file doesn't exist") console.log('ERROR: Could not find .env file.');
+    else throw err;
+}
 
 exports.handler = function(event, context) {
 
