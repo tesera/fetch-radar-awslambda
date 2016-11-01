@@ -2,6 +2,7 @@
 const AWS = require('aws-sdk');
 const http = require('http');
 const request = require('request');
+const S3 = new AWS.S3();
 
 require('node-env-file')('.env');
 
@@ -52,6 +53,20 @@ exports.processSite = function(site, datetime) {
             exports.getImageURLs(site, type, evening),
         ]);
     }));
+};
 
-    
+exports.transferImage = function(image_url, bucket, filename) {
+    var image_url = `http://climate.weather.gc.ca${image_url}`;
+    return new Promise((resolve, reject) => {
+        request(image_url, (error, response, body) => {
+            S3.putObject({
+                Bucket: bucket,
+                Key: filename,
+                Body: body
+            }, (err, data) => {
+                if(err) reject(err);
+                else resolve(data);
+            });
+        });
+    });
 };
