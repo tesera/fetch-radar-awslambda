@@ -37,3 +37,20 @@ exports.getImageURLs = function(site, type, datetime) {
         });
     });
 };
+
+exports.processSite = function(site, datetime) {
+    var morning = new Date(datetime);
+    morning.setHours(0);
+    var evening = new Date(datetime);
+    evening.setHours(12);
+
+    var types = process.env.TYPES.split(',');
+    return Promise.all(types.map(function(type) {
+        return Promise.all([
+            exports.getImageURLs(site, type, morning),
+            exports.getImageURLs(site, type, evening),
+        ]);
+    }));
+
+    
+};
