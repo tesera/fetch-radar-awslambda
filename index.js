@@ -5,12 +5,12 @@ const request = require('request');
 
 require('node-env-file')('.env');
 
-
 exports.handler = function(event, context) {
 
     bucket = process.env.BUCKET;
     sites = process.env.SITES.split(',');
-    types = process.env.TYPES.split(',');
+
+    event['time'] = new Date(event['time']);
 
     console.log('Sites: ', sites);
     console.log('Types: ', types);
@@ -24,8 +24,9 @@ exports.getImageURLs = function(site, type, datetime) {
     return new Promise((resolve, reject) => {
         request(imageListURL, (error, response, body) => {
             if(error) reject(error);
-            if(response.statusCode !== 200) reject("Unsuccessful response from server");
-            if(!error && response.statusCode == 200) {
+            else if(body.indexOf('blobArray')<0) reject("Image type not available at specified time");
+            else if(response.statusCode !== 200) reject("Unsuccessful response from server");
+            else if(!error && response.statusCode == 200) {
                 var re = /^\s*blobArray = \[([\s\S]*)\],$/gm;
                 var blobArray = re.exec(body)[1]
                     .split('\n')
@@ -33,7 +34,6 @@ exports.getImageURLs = function(site, type, datetime) {
                     .map((s) => { return /s*'(.*)',/.exec(s)[1]; });
                 resolve(blobArray);
             }
-
         });
     });
 };
