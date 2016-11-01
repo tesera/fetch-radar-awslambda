@@ -16,6 +16,7 @@
     "url": "https://github.com/tesera/lambda-fetch-radar/issues"
   },
   "homepage": "https://github.com/tesera/lambda-fetch-radar#readme",
+  "engines": {"node": "4.x"},
   "dependencies": {
     "aws-sdk": "^2.6.9",
     "node-env-file": "^0.1.8",
