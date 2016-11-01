@@ -8,20 +8,21 @@ describe('getImageURLs()', function() {
         var site = 'WUJ';
         var type = 'PRECIPET_SNOW_WEATHEROFFICE'
         var datetime = new Date(2015,10,17,10);
+        datetime.setHours(0);
         var expected = [
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+10.10.35.793302+AM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+11.11.03.537530+AM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+12.10.49.841273+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+01.10.48.682039+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+02.10.55.858334+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+03.10.49.030733+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+04.10.35.781304+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+05.10.37.297283+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+06.10.39.525245+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+07.10.38.930713+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+08.10.34.513546+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+09.10.35.458651+PM&site=WUJ'},
-            {type: 'PRECIPET_SNOW_WEATHEROFFICE', image:'/lib/radar/image.php?time=17-OCT-15+10.10.29.481384+PM&site=WUJ'},
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+01.10.52.248077+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+02.21.11.278688+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+03.21.03.511521+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+04.20.56.592829+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+05.21.55.921080+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+06.33.15.455839+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+07.11.02.240672+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+08.10.29.873196+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+09.10.43.867816+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+10.10.35.793302+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+11.11.03.537530+AM&site=WUJ' },
+            { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+12.10.49.841273+PM&site=WUJ' }
         ];
 
         lambda.getImageURLs(site, type, datetime)
