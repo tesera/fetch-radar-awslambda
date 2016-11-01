@@ -3,12 +3,11 @@ const lambda = require('../index');
 
 
 describe('getImageURLs()', function() {
-    var site = 'WUJ';
-    var type = 'PRECIPET_SNOW_WEATHEROFFICE'
-    var datetime = new Date(2015,10,17,10);
 
     it('finds and returns the image URLs', function(done) {
-
+        var site = 'WUJ';
+        var type = 'PRECIPET_SNOW_WEATHEROFFICE'
+        var datetime = new Date(2015,10,17,10);
         var expected = [
             '/lib/radar/image.php?time=17-OCT-15+10.10.35.793302+AM&site=WUJ',
             '/lib/radar/image.php?time=17-OCT-15+11.11.03.537530+AM&site=WUJ',
@@ -33,7 +32,7 @@ describe('getImageURLs()', function() {
             .catch(done);
     });
 
-    it('throws an error when the image type is not available at the specified time', (done) => {
+    it('throws an error when the image type is not available at the specified time', function(done) {
         var site = 'WUJ';
         var type = 'COMP_PRECIPET_RAIN_A11Y_WEATHEROFFICE'
         var datetime = new Date(2015,01,12,00);
