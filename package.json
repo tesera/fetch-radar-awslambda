@@ -1,0 +1,27 @@
+{
+  "name": "lambda-fetch-radar",
+  "version": "0.0.0",
+  "description": "Fetch weather radar imagery from weather.gc.ca and put images on AWS S3.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tesera/lambda-fetch-radar.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tesera/lambda-fetch-radar/issues"
+  },
+  "homepage": "https://github.com/tesera/lambda-fetch-radar#readme",
+  "dependencies": {
+    "aws-sdk": "^2.6.9",
+    "node-env-file": "^0.1.8",
+    "request": "^2.75.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.1.2"
+  }
+}
