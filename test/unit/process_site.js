@@ -4,7 +4,7 @@ const lambda = require('../../index');
 
 describe('processSite()', function() {
 
-    process.env.TYPES = ['PRECIPET_SNOW_WEATHEROFFICE','PRECIPET_SNOW_A11Y_WEATHEROFFICE'];
+    var types = ['PRECIPET_SNOW_WEATHEROFFICE','PRECIPET_SNOW_A11Y_WEATHEROFFICE'];
     var site = 'WUJ';
     var datetime = new Date(2015,10,17);
 
@@ -19,7 +19,7 @@ describe('processSite()', function() {
             return "image array result";
         };
 
-        lambda.processSite(site, datetime).then((actual) => {
+        lambda.processSite(site, types, datetime).then((actual) => {
             assert.deepEqual(expected, actual);
             done();
         })
