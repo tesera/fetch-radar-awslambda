@@ -1,5 +1,5 @@
 const assert = require('assert');
-const lambda = require('../index');
+const lambda = require('../../index');
 
 
 describe('transferImage()', function() {
