@@ -4,7 +4,7 @@
   "description": "Fetch weather radar imagery from weather.gc.ca and put images on AWS S3.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive"
+    "test": "mocha --recursive -i --fgrep '#WIP'"
   },
   "repository": {
     "type": "git",

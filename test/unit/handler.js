@@ -21,7 +21,7 @@ describe('handler()', function() {
         ]
     };;
 
-    it('Requests the images for each type at each site', function(done) {
+    it('Requests the images for each type at each site #WIP', function(done) {
         this.timeout(0);
 
         lambda.stub('getImageURLs', () => Promise.resolve([1]));
