@@ -1,6 +1,7 @@
 const assert = require('assert');
-const lambda = require('../../index');
+const lambda = require('../test_helper');
 
+beforeEach(function() {return lambda.unstub();});
 
 describe('transferImage()', function() {
     var bucket = 'weather-radar';
@@ -10,9 +11,9 @@ describe('transferImage()', function() {
         var expected = null;
         this.timeout(0);
 
-        lambda.getS3 = function() {
+        lambda.stub('getS3', function() {
             return { putObject: function(args, cb) { cb(null, {ETag: 'asdfasfd'}); } }
-        };
+        });
 
         lambda.transferImage(image_obj.image, bucket, 'test/WUJ-PRECIPET_SNOW_WEATHEROFFICE-17OCT15_12.23.33').then((actual) => {
             if('ETag' in actual) done();

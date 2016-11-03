@@ -3,10 +3,38 @@ const lambda = require('../../index');
 
 
 describe('handler()', function() {
-    var bucket = 'weather-radar';
-    var image_obj = { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ' };
+    process.env.TYPES = 'PRECIPET_SNOW_WEATHEROFFICE,PRECIP_RAIN_WEATHEROFFICE';
+    process.env.SITES = 'WUJ,XSM';
+    var expected = {};
 
-    it('fetches all the images', function(done) {
-        done('WIP');
+    var scheduledEvent = {
+        "account": "123456789012",
+        "region": "us-east-1",
+        "detail": {},
+        "detail-type": "Scheduled Event",
+        "source": "aws.events",
+        "time": "2013-10-17T00:00:00Z",
+        "id": "cdc73f9d-aea9-11e3-9d5a-835b769c0d9c",
+        "resources": [
+            "arn:aws:events:us-east-1:123456789012:rule/my-schedule"
+        ]
+    };;
+
+    it('Requests the images for each type at each site', function(done) {
+        this.timeout(0);
+
+        lambda.getImageURLs = function() {
+            return Promise.resolve([1]);
+        };
+
+        lambda.transferImage = function() {
+            return Promise.resolve("transfer images result");
+        }
+
+        lambda.handler(scheduledEvent).then((actual) => {
+            console.log(actual[0][0]);
+            done('WIP');
+        })
+        .catch(done);
     });
 });
