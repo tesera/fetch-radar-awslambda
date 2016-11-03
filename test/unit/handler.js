@@ -1,6 +1,7 @@
 const assert = require('assert');
-const lambda = require('../../index');
+const lambda = require('../test_helper');
 
+beforeEach(() => lambda.unstub());
 
 describe('handler()', function() {
     process.env.TYPES = 'PRECIPET_SNOW_WEATHEROFFICE,PRECIP_RAIN_WEATHEROFFICE';
@@ -23,13 +24,8 @@ describe('handler()', function() {
     it('Requests the images for each type at each site', function(done) {
         this.timeout(0);
 
-        lambda.getImageURLs = function() {
-            return Promise.resolve([1]);
-        };
-
-        lambda.transferImage = function() {
-            return Promise.resolve("transfer images result");
-        }
+        lambda.stub('getImageURLs', () => Promise.resolve([1]));
+        lambda.stub('transferImage', () => Promise.resolve("transfer images result"));
 
         lambda.handler(scheduledEvent).then((actual) => {
             console.log(actual[0][0]);
