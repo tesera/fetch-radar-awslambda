@@ -4,7 +4,7 @@
   "description": "Fetch weather radar imagery from weather.gc.ca and put images on AWS S3.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --recursive -i --fgrep '#WIP'"
   },
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
     "url": "https://github.com/tesera/lambda-fetch-radar/issues"
   },
   "homepage": "https://github.com/tesera/lambda-fetch-radar#readme",
+  "engines": {"node": "4.x"},
   "dependencies": {
     "aws-sdk": "^2.6.9",
     "node-env-file": "^0.1.8",

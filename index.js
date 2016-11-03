@@ -4,18 +4,25 @@ const http = require('http');
 const request = require('request');
 const S3 = new AWS.S3();
 
-require('node-env-file')('.env');
+try {
+    require('node-env-file')('.env');
+} catch(err) {
+    if(err instanceof TypeError && err.message.substring(0,30) == "Environment file doesn't exist") console.log('ERROR: Could not find .env file.');
+    else throw err;
+}
 
 exports.handler = function(event, context) {
 
     bucket = process.env.BUCKET;
     sites = process.env.SITES.split(',');
+    types = process.env.TYPES.split(',');
 
     event['time'] = new Date(event['time']);
 
     console.log('Sites: ', sites);
     console.log('Types: ', types);
     console.log('Time:  ', event['time']);
+    return Promise.all(sites.map((site) => exports.processSite(site, types, event['time'], bucket)));
 };
 
 exports.getImageURLs = function(site, type, datetime) {
@@ -40,26 +47,54 @@ exports.getImageURLs = function(site, type, datetime) {
     });
 };
 
-exports.processSite = function(site, datetime) {
+exports.processSite = function(site, types, datetime, bucket) {
     var morning = new Date(datetime);
     morning.setHours(0);
     var evening = new Date(datetime);
     evening.setHours(12);
 
-    var types = process.env.TYPES.split(',');
-    return Promise.all(types.map(function(type) {
-        return Promise.all([
-            exports.getImageURLs(site, type, morning),
-            exports.getImageURLs(site, type, evening),
-        ]);
-    }));
+    return Promise.all(types.map(type =>
+
+        Promise.all([
+            getSiteUrls(site, type, morning),
+            getSiteUrls(site, type, evening)
+        ]) // 2 arrays of 12 urls each
+        
+        .then((results) => {
+            var morning_urls = results[0];
+            var evening_urls = results[1];
+            var all_urls = morning_urls.concat(evening_urls);
+
+            return all_urls; // 1 array of 24 urls
+        })
+        
+        .then(image_urls => Promise.all(
+            // map the image_url to a request
+            image_urls.map( image_url => exports.transferImage(image_url, bucket, 'filename here') )
+        ))
+        
+    ));
+  
+    function debugAndReturn(thing) {
+        console.log('debug: ', thing);
+        return thing;
+    }
+
+    function getSiteUrls(site, type, timeofday) {
+        return exports.getImageURLs(site, type, timeofday).catch(errorHandler);
+    }
+  
+    function errorHandler(err) {
+        console.error('getting urls failed');
+        return [];
+    }
 };
 
 exports.transferImage = function(image_url, bucket, filename) {
     var image_url = `http://climate.weather.gc.ca${image_url}`;
     return new Promise((resolve, reject) => {
         request(image_url, (error, response, body) => {
-            S3.putObject({
+            exports.getS3().putObject({
                 Bucket: bucket,
                 Key: filename,
                 Body: body
@@ -70,3 +105,8 @@ exports.transferImage = function(image_url, bucket, filename) {
         });
     });
 };
+
+exports.getS3 = function() {
+    return S3;
+};
+
