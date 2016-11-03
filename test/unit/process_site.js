@@ -22,7 +22,7 @@ describe('processSite()', function() {
         return lambda.processSite(site, types, datetime).then(actual => assert.deepEqual(expected, actual));
     });
 
-    // it('Calls transfer image for each image returned from getImageURLs', function(done) {
-
-    // });
+    it('Calls transfer image for each image returned from getImageURLs', function(done) {
+        done('WIP');
+    });
 });
