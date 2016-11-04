@@ -3,6 +3,9 @@ const AWS = require('aws-sdk');
 const http = require('http');
 const request = require('request');
 const S3 = new AWS.S3();
+const url = require('url');
+const querystring = require('querystring');
+const moment = require('moment');
 
 try {
     require('node-env-file')('.env');
@@ -18,10 +21,8 @@ exports.handler = function(event, context) {
     types = process.env.TYPES.split(',');
 
     event['time'] = new Date(event['time']);
+    event['time'] = new Date(event['time'].getTime()-86400000);
 
-    console.log('Sites: ', sites);
-    console.log('Types: ', types);
-    console.log('Time:  ', event['time']);
     return Promise.all(sites.map((site) => exports.processSite(site, types, event['time'], bucket)));
 };
 
@@ -32,8 +33,8 @@ exports.getImageURLs = function(site, type, datetime) {
     return new Promise((resolve, reject) => {
         request(imageListURL, (error, response, body) => {
             if(error) reject(error);
-            else if(body.indexOf('blobArray')<0) reject("Image type not available at specified time");
-            else if(response.statusCode !== 200) reject("Unsuccessful response from server");
+            else if(body.indexOf('blobArray')<0) reject(`Image not available: site=${site} type=${type} datetime=${datetime}`);
+            else if(response.statusCode !== 200) reject("Unsuccessful response from server: site=${site} type=${type} datetime=${datetime}");
             else if(!error && response.statusCode == 200) {
                 var re = /^\s*blobArray = \[([\s\S]*)\],$/gm;
                 var blobArray = re.exec(body)[1]
@@ -67,10 +68,10 @@ exports.processSite = function(site, types, datetime, bucket) {
 
             return all_urls; // 1 array of 24 urls
         })
-        
-        .then(image_urls => Promise.all(
+
+        .then(images => Promise.all(
             // map the image_url to a request
-            image_urls.map( image_url => exports.transferImage(image_url, bucket, 'filename here') )
+            images.map( img => exports.transferImage(img['image'], bucket, exports.filenameForImg(img)) )
         ))
         
     ));
@@ -85,7 +86,7 @@ exports.processSite = function(site, types, datetime, bucket) {
     }
   
     function errorHandler(err) {
-        console.error('getting urls failed');
+        console.error(err);
         return [];
     }
 };
@@ -104,6 +105,14 @@ exports.transferImage = function(image_url, bucket, filename) {
             });
         });
     });
+};
+
+exports.filenameForImg = function(img) {
+    var query = url.parse(img['image']).query;
+    var params = querystring.parse(query);
+    var datestr = moment(params.time, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss');
+    var site = params.site;
+    return `${params.site}-${img.type}-${datestr}.gif`;
 };
 
 exports.getS3 = function() {

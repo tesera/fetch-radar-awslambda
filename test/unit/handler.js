@@ -6,7 +6,6 @@ beforeEach(() => lambda.unstub());
 describe('handler()', function() {
     process.env.TYPES = 'PRECIPET_SNOW_WEATHEROFFICE,PRECIP_RAIN_WEATHEROFFICE';
     process.env.SITES = 'WUJ,XSM';
-    var expected = {};
 
     var scheduledEvent = {
         "account": "123456789012",
@@ -19,18 +18,26 @@ describe('handler()', function() {
         "resources": [
             "arn:aws:events:us-east-1:123456789012:rule/my-schedule"
         ]
-    };;
+    };
 
-    it('Requests the images for each type at each site #WIP', function(done) {
-        this.timeout(0);
+    it('Makes the request for the previous day', function() {
+        var expected = [1381881600,1381881600];
+        lambda.stub('processSite', (site, types, datetime) => Promise.resolve(datetime.getTime()/1000));
 
-        lambda.stub('getImageURLs', () => Promise.resolve([1]));
-        lambda.stub('transferImage', () => Promise.resolve("transfer images result"));
+        return lambda.handler(scheduledEvent).then(actual => assert.deepEqual(actual, expected));
+    });
 
-        lambda.handler(scheduledEvent).then((actual) => {
-            console.log(actual[0][0]);
-            done('WIP');
-        })
-        .catch(done);
+    it('Calls process site for each site requested', function() {
+        var expected = [ 'WUJ', 'XSM' ];
+        lambda.stub('processSite', (site) => Promise.resolve(site));
+
+        return lambda.handler(scheduledEvent).then((actual) => assert.deepEqual(expected, actual));
+    });
+
+    it('Supplies the requested types to processSite', function() {
+        var expected = [['PRECIPET_SNOW_WEATHEROFFICE','PRECIP_RAIN_WEATHEROFFICE'],['PRECIPET_SNOW_WEATHEROFFICE','PRECIP_RAIN_WEATHEROFFICE']];
+        lambda.stub('processSite', (site, types) => Promise.resolve(types));
+
+        return lambda.handler(scheduledEvent).then((actual) => assert.deepEqual(expected, actual));
     });
 });
