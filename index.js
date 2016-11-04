@@ -29,8 +29,8 @@ exports.getImageURLs = function(site, type, datetime) {
     return new Promise((resolve, reject) => {
         request(imageListURL, (error, response, body) => {
             if(error) reject(error);
-            else if(body.indexOf('blobArray')<0) reject("Image type not available at specified time");
-            else if(response.statusCode !== 200) reject("Unsuccessful response from server");
+            else if(body.indexOf('blobArray')<0) reject(`Image not available: site=${site} type=${type} datetime=${datetime}`);
+            else if(response.statusCode !== 200) reject("Unsuccessful response from server: site=${site} type=${type} datetime=${datetime}");
             else if(!error && response.statusCode == 200) {
                 var re = /^\s*blobArray = \[([\s\S]*)\],$/gm;
                 var blobArray = re.exec(body)[1]
@@ -82,7 +82,7 @@ exports.processSite = function(site, types, datetime, bucket) {
     }
   
     function errorHandler(err) {
-        console.error('getting urls failed');
+        console.error(err);
         return [];
     }
 };

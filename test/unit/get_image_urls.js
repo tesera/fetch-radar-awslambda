@@ -33,7 +33,7 @@ describe('getImageURLs()', function() {
         var site = 'WUJ';
         var type = 'COMP_PRECIPET_RAIN_A11Y_WEATHEROFFICE'
         var datetime = new Date(2015,01,12,00);
-        var expected_error = "Image type not available at specified time";
+        var expected_error = "Image not available: site=WUJ type=COMP_PRECIPET_RAIN_A11Y_WEATHEROFFICE datetime=Thu Feb 12 2015 00:00:00 GMT-0700 (MST)";
 
         lambda.getImageURLs(site, type, datetime)
             .then((actual) => {
@@ -41,7 +41,7 @@ describe('getImageURLs()', function() {
             })
             .catch(function(message) {
                 if(message == expected_error) done();
-                else done("Did not receive expected error");
+                else done(`Did not receive expected error. Error: ${message}`);
             })
     });
 });
