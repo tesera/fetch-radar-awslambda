@@ -4,7 +4,7 @@ const lambda = require('../../index');
 
 describe('getImageURLs()', function() {
 
-    it('finds and returns the image URLs', function(done) {
+    it('finds and returns the image URLs', function() {
         var site = 'WUJ';
         var type = 'PRECIPET_SNOW_WEATHEROFFICE'
         var datetime = new Date(2015,10,17,10);
@@ -25,12 +25,8 @@ describe('getImageURLs()', function() {
             { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+12.10.49.841273+PM&site=WUJ' }
         ];
 
-        lambda.getImageURLs(site, type, datetime)
-            .then((actual) => {
-                assert.deepEqual(expected, actual);
-                done();
-            })
-            .catch(done);
+        return lambda.getImageURLs(site, type, datetime)
+            .then((actual) => assert.deepEqual(expected, actual));
     });
 
     it('throws an error when the image type is not available at the specified time', function(done) {
