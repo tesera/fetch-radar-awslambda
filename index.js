@@ -3,6 +3,9 @@ const AWS = require('aws-sdk');
 const http = require('http');
 const request = require('request');
 const S3 = new AWS.S3();
+const url = require('url');
+const querystring = require('querystring');
+const moment = require('moment');
 
 try {
     require('node-env-file')('.env');
@@ -64,10 +67,10 @@ exports.processSite = function(site, types, datetime, bucket) {
 
             return all_urls; // 1 array of 24 urls
         })
-        
-        .then(image_urls => Promise.all(
+
+        .then(images => Promise.all(
             // map the image_url to a request
-            image_urls.map( image_url => exports.transferImage(image_url, bucket, 'filename here') )
+            images.map( img => exports.transferImage(img['image'], bucket, exports.filenameForImg(img)) )
         ))
         
     ));
@@ -101,6 +104,14 @@ exports.transferImage = function(image_url, bucket, filename) {
             });
         });
     });
+};
+
+exports.filenameForImg = function(img) {
+    var query = url.parse(img['image']).query;
+    var params = querystring.parse(query);
+    var datestr = moment(params.time, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss');
+    var site = params.site;
+    return `${params.site}-${img.type}-${datestr}.gif`;
 };
 
 exports.getS3 = function() {
