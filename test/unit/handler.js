@@ -18,7 +18,7 @@ describe('handler()', function() {
         "resources": [
             "arn:aws:events:us-east-1:123456789012:rule/my-schedule"
         ]
-    };;
+    };
 
     it('Calls process site for each site requested', function() {
         var expected = [ 'WUJ', 'XSM' ];
