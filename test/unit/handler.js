@@ -20,6 +20,13 @@ describe('handler()', function() {
         ]
     };
 
+    it('Makes the request for the previous day', function() {
+        var expected = [1381881600,1381881600];
+        lambda.stub('processSite', (site, types, datetime) => Promise.resolve(datetime.getTime()/1000));
+
+        return lambda.handler(scheduledEvent).then(actual => assert.deepEqual(actual, expected));
+    });
+
     it('Calls process site for each site requested', function() {
         var expected = [ 'WUJ', 'XSM' ];
         lambda.stub('processSite', (site) => Promise.resolve(site));

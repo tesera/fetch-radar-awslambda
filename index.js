@@ -21,6 +21,7 @@ exports.handler = function(event, context) {
     types = process.env.TYPES.split(',');
 
     event['time'] = new Date(event['time']);
+    event['time'] = new Date(event['time'].getTime()-86400000);
 
     return Promise.all(sites.map((site) => exports.processSite(site, types, event['time'], bucket)));
 };
