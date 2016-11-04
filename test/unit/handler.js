@@ -26,8 +26,6 @@ describe('handler()', function() {
 
         lambda.stub('processSite', (site) => Promise.resolve(site));
 
-        return lambda.handler(scheduledEvent).then((actual) => {
-            assert.deepEqual(expected, actual);
-        });
+        return lambda.handler(scheduledEvent).then((actual) => assert.deepEqual(expected, actual));
     });
 });
