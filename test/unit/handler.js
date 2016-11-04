@@ -6,7 +6,7 @@ beforeEach(() => lambda.unstub());
 describe('handler()', function() {
     process.env.TYPES = 'PRECIPET_SNOW_WEATHEROFFICE,PRECIP_RAIN_WEATHEROFFICE';
     process.env.SITES = 'WUJ,XSM';
-    var expected = {};
+    var expected = [ 'WUJ', 'XSM' ];
 
     var scheduledEvent = {
         "account": "123456789012",
@@ -21,16 +21,13 @@ describe('handler()', function() {
         ]
     };;
 
-    it('Requests the images for each type at each site #WIP', function(done) {
+    it('Calls process site for each site requested', function() {
         this.timeout(0);
 
-        lambda.stub('getImageURLs', () => Promise.resolve([1]));
-        lambda.stub('transferImage', () => Promise.resolve("transfer images result"));
+        lambda.stub('processSite', (site) => Promise.resolve(site));
 
-        lambda.handler(scheduledEvent).then((actual) => {
-            console.log(actual[0][0]);
-            done('WIP');
-        })
-        .catch(done);
+        return lambda.handler(scheduledEvent).then((actual) => {
+            assert.deepEqual(expected, actual);
+        });
     });
 });
