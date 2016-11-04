@@ -6,7 +6,6 @@ beforeEach(() => lambda.unstub());
 describe('handler()', function() {
     process.env.TYPES = 'PRECIPET_SNOW_WEATHEROFFICE,PRECIP_RAIN_WEATHEROFFICE';
     process.env.SITES = 'WUJ,XSM';
-    var expected = [ 'WUJ', 'XSM' ];
 
     var scheduledEvent = {
         "account": "123456789012",
@@ -22,9 +21,15 @@ describe('handler()', function() {
     };;
 
     it('Calls process site for each site requested', function() {
-        this.timeout(0);
-
+        var expected = [ 'WUJ', 'XSM' ];
         lambda.stub('processSite', (site) => Promise.resolve(site));
+
+        return lambda.handler(scheduledEvent).then((actual) => assert.deepEqual(expected, actual));
+    });
+
+    it('Supplies the requested types to processSite', function() {
+        var expected = [['PRECIPET_SNOW_WEATHEROFFICE','PRECIP_RAIN_WEATHEROFFICE'],['PRECIPET_SNOW_WEATHEROFFICE','PRECIP_RAIN_WEATHEROFFICE']];
+        lambda.stub('processSite', (site, types) => Promise.resolve(types));
 
         return lambda.handler(scheduledEvent).then((actual) => assert.deepEqual(expected, actual));
     });
