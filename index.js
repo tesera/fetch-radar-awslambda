@@ -19,9 +19,6 @@ exports.handler = function(event, context) {
 
     event['time'] = new Date(event['time']);
 
-    console.log('Sites: ', sites);
-    console.log('Types: ', types);
-    console.log('Time:  ', event['time']);
     return Promise.all(sites.map((site) => exports.processSite(site, types, event['time'], bucket)));
 };
 
