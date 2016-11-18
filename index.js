@@ -13,8 +13,8 @@ winston.loggers.add('cloudwatch', {
     transports: [
         new WinstonCloudWatch({
             awsRegion: 'us-east-1',
-            logGroupName: 'test',
-            LogStreamName: 'first',
+            logGroupName: 'lambda-fetch-radar',
+            LogStreamName: 'moment().format("YYYYMMDD")-lambda-fetch-radar',
         })
     ]
 });
