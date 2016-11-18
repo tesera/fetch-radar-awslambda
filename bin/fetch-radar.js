@@ -17,4 +17,4 @@ var scheduledEvent = {
     ]
 };;
 
-lambda.handler(scheduledEvent).then(console.log);
+lambda.handler(scheduledEvent);

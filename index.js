@@ -6,6 +6,18 @@ const S3 = new AWS.S3();
 const url = require('url');
 const querystring = require('querystring');
 const moment = require('moment');
+const winston = require('winston');
+const WinstonCloudWatch = require('winston-cloudwatch');
+
+winston.loggers.add('cloudwatch', {
+    transports: [
+        new WinstonCloudWatch({
+            awsRegion: 'us-east-1',
+            logGroupName: 'test',
+            LogStreamName: 'first',
+        })
+    ]
+});
 
 try {
     require('node-env-file')('.env');
@@ -15,10 +27,12 @@ try {
 }
 
 exports.handler = function(event, context) {
+    winston.info("Starting radar grab");
 
     bucket = process.env.BUCKET;
     sites = process.env.SITES.split(',');
     types = process.env.TYPES.split(',');
+    winston.info({bucket: bucket, sites, types})
 
     event['time'] = new Date(event['time']);
     event['time'] = new Date(event['time'].getTime()-86400000);
@@ -33,8 +47,8 @@ exports.getImageURLs = function(site, type, datetime) {
     return new Promise((resolve, reject) => {
         request(imageListURL, (error, response, body) => {
             if(error) reject(error);
-            else if(body.indexOf('blobArray')<0) reject(`Image not available: site=${site} type=${type} datetime=${datetime}`);
-            else if(response.statusCode !== 200) reject("Unsuccessful response from server: site=${site} type=${type} datetime=${datetime}");
+            else if(body.indexOf('blobArray')<0) reject(`Image list not available for site=${site} type=${type} datetime=${datetime}`);
+            else if(response.statusCode !== 200) reject("Error getting image list for site=${site} type=${type} datetime=${datetime}");
             else if(!error && response.statusCode == 200) {
                 var re = /^\s*blobArray = \[([\s\S]*)\],$/gm;
                 var blobArray = re.exec(body)[1]
@@ -42,6 +56,7 @@ exports.getImageURLs = function(site, type, datetime) {
                     .filter((s) => { return !s.match(/^\s+$/); })
                     .map((s) => { return /s*'(.*)',/.exec(s)[1]; })
                     .map((url) => { return {type: type, image: url}; })
+                winston.info("Got image list for", {site, type, times: blobArray.map((res) => moment(res.image, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss'))});
                 resolve(blobArray);
             }
         });
@@ -86,12 +101,13 @@ exports.processSite = function(site, types, datetime, bucket) {
     }
   
     function errorHandler(err) {
-        console.error(err);
+        winston.warn(err);
         return [];
     }
 };
 
 exports.transferImage = function(image_url, bucket, filename) {
+    winston.info(`Transferring ${filename} to s3://${bucket}`);
     var image_url = `http://climate.weather.gc.ca${image_url}`;
     return new Promise((resolve, reject) => {
         request(image_url, (error, response, body) => {
