@@ -14,7 +14,7 @@ winston.loggers.add('cloudwatch', {
         new WinstonCloudWatch({
             awsRegion: 'us-east-1',
             logGroupName: 'lambda-fetch-radar',
-            LogStreamName: 'moment().format("YYYYMMDD")-lambda-fetch-radar',
+            LogStreamName: moment().format("YYYYMMDD") + '-lambda-fetch-radar',
         })
     ]
 });
@@ -56,7 +56,7 @@ exports.getImageURLs = function(site, type, datetime) {
                     .filter((s) => { return !s.match(/^\s+$/); })
                     .map((s) => { return /s*'(.*)',/.exec(s)[1]; })
                     .map((url) => { return {type: type, image: url}; })
-                winston.info("Got image list for", {site, type, times: blobArray.map((res) => moment(res.image, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss'))});
+                winston.info("Got image list for", {site, type, url: imageListURL, times: blobArray.map((res) => moment(res.image, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss'))});
                 resolve(blobArray);
             }
         });
