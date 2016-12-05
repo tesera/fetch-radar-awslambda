@@ -42,7 +42,7 @@ exports.handler = function(event, context) {
 
 exports.getImageURLs = function(site, type, datetime) {
     var duration = 12;
-    var imageListURL = `http://climate.weather.gc.ca/radar/index_e.html?site=${site}&year=${datetime.getFullYear()}&month=${datetime.getMonth()}&day=${datetime.getDate()}&hour=${datetime.getHours()}&minute=${datetime.getMinutes()}&duration=${duration}&image_type=${type}`
+    var imageListURL = `http://climate.weather.gc.ca/radar/index_e.html?site=${site}&year=${datetime.getFullYear()}&month=${datetime.getMonth()}&day=${datetime.getDate()}&hour=${datetime.getHours()}&minute=0&duration=${duration}&image_type=${type}`
 
     return new Promise((resolve, reject) => {
         request(imageListURL, (error, response, body) => {
