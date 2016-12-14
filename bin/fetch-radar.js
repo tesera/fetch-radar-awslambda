@@ -15,6 +15,6 @@ var scheduledEvent = {
     "resources": [
         "arn:aws:events:us-east-1:123456789012:rule/my-schedule"
     ]
-};;
+};
 
 lambda.handler(scheduledEvent);
