@@ -1,3 +1,7 @@
+// For testing purposes, lets set the timezone so
+// that it doesn't have different results on codeship
+process.env.TZ = 'America/Edmonton'
+
 const lambda = require('../index');
 const original = Object.assign({}, lambda);
 
