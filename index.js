@@ -97,8 +97,11 @@ exports.processSite = function(site, types, datetime, bucket) {
     }
 };
 
+exports.openTransfers = 0;
+exports.completedTransfers = 0;
+
 exports.transferImage = function(image_url, bucket, filename) {
-    winston.debug(`Transferring ${filename} to s3://${bucket}`);
+    this.openTransfers++;
     var image_url = `http://climate.weather.gc.ca${image_url}`;
     return new Promise((resolve, reject) => {
         request(image_url, (error, response, body) => {
@@ -107,6 +110,8 @@ exports.transferImage = function(image_url, bucket, filename) {
                 Key: filename,
                 Body: body
             }, (err, data) => {
+                this.completedTransfers++;
+                winston.debug(`(${this.completedTransfers}/${this.openTransfers}) Finished s3://${bucket}/${filename}`);
                 if(err) reject(err);
                 else resolve(data);
             });
