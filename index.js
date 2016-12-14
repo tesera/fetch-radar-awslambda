@@ -16,7 +16,7 @@ try {
     else throw err;
 }
 
-exports.handler = function(event, context) {
+exports.handler = function(event, context, callback) {
     winston.info("Starting radar grab");
 
     bucket = process.env.BUCKET;
@@ -27,7 +27,8 @@ exports.handler = function(event, context) {
     event['time'] = new Date(event['time']);
     event['time'] = new Date(event['time'].getTime()-86400000);
 
-    return Promise.all(sites.map((site) => exports.processSite(site, types, event['time'], bucket)));
+    return Promise.all(sites.map((site) => exports.processSite(site, types, event['time'], bucket)))
+        .then(callback);
 };
 
 exports.getImageURLs = function(site, type, datetime) {
