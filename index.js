@@ -28,7 +28,8 @@ exports.handler = function(event, context, callback) {
     event['time'] = new Date(event['time'].getTime()-86400000);
 
     return Promise.all(sites.map((site) => exports.processSite(site, types, event['time'], bucket)))
-        .then(callback);
+        .then((result) => callback(null, result))
+        .catch(callback);
 };
 
 exports.getImageURLs = function(site, type, datetime) {
