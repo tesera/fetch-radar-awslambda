@@ -99,6 +99,7 @@ exports.processSite = function(site, types, datetime, bucket) {
 
 exports.openTransfers = 0;
 exports.completedTransfers = 0;
+exports.failedTransfers = 0;
 
 exports.transferImage = function(image_url, bucket, filename) {
     this.openTransfers++;
@@ -111,9 +112,14 @@ exports.transferImage = function(image_url, bucket, filename) {
                 Body: body
             }, (err, data) => {
                 this.completedTransfers++;
-                winston.debug(`(${this.completedTransfers}/${this.openTransfers}) Finished s3://${bucket}/${filename}`);
-                if(err) reject(err);
-                else resolve(data);
+                
+                if(err) {
+                    reject(err);
+                    winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) FAILED s3://${bucket}/${filename}`);
+                } else {
+                    resolve(data);
+                    winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) Finished s3://${bucket}/${filename}`);
+                }
             });
         });
     });
