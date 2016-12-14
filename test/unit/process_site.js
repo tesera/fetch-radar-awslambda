@@ -26,12 +26,12 @@ describe('processSite()', function() {
         lambda.stub('transferImage', (img, bucket, filename) => Promise.resolve(filename));
         var expected = [
             [
-                'WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif',
-                'WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
+                '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif',
+                '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
             ],
             [
-                'WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif',
-                'WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
+                '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif',
+                '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
             ]
         ];
 
@@ -45,10 +45,18 @@ describe('processSite()', function() {
 
 describe('filenameForImg()', function() {
     var img = { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ' };
-    var expected = 'WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
 
     it('calculates the correct filename for a supplied img', function() {
         var actual = lambda.filenameForImg(img);
+        var expected = '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
         assert.equal(expected, actual);
+    });
+
+    it('calculates the correct path based on an environment variable', function() {
+        var savedPath = process.env.PATH;
+        process.env.PATH = 'YEAR/YEAR/YEAR'
+        var expected = '2015/2015/2015/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
+        var actual = lambda.filenameForImg(img);
+        process.env.PATH = savedPath;
     });
 });

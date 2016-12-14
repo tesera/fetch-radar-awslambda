@@ -1,7 +1,6 @@
 const assert = require('assert');
 const lambda = require('../../index');
 
-
 describe('getImageURLs()', function() {
 
     it('finds and returns the image URLs', function() {
@@ -33,7 +32,7 @@ describe('getImageURLs()', function() {
         var site = 'WUJ';
         var type = 'COMP_PRECIPET_RAIN_A11Y_WEATHEROFFICE'
         var datetime = new Date(2015,01,12,00);
-        var expected_error = "Image not available: site=WUJ type=COMP_PRECIPET_RAIN_A11Y_WEATHEROFFICE datetime=Thu Feb 12 2015 00:00:00 GMT-0700 (MST)";
+        var expected_error = "Image list not available for site=WUJ type=COMP_PRECIPET_RAIN_A11Y_WEATHEROFFICE datetime=Thu Feb 12 2015 00:00:00 GMT-0700 (MST)";
 
         lambda.getImageURLs(site, type, datetime)
             .then((actual) => {
@@ -41,7 +40,7 @@ describe('getImageURLs()', function() {
             })
             .catch(function(message) {
                 if(message == expected_error) done();
-                else done(`Did not receive expected error. Error: ${message}`);
+                else done(`Did not receive expected error.\n\nExpected:\t${expected_error}\nActual: \t${message}\n`);
             })
     });
 });

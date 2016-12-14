@@ -124,11 +124,16 @@ exports.transferImage = function(image_url, bucket, filename) {
 };
 
 exports.filenameForImg = function(img) {
+    if(!process.env.S3_PATH) process.env.S3_PATH = 'YEAR/SITE'
     var query = url.parse(img['image']).query;
     var params = querystring.parse(query);
-    var datestr = moment(params.time, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss');
+    var date = moment(params.time, 'DD-MMM-YY hh.mm.ss.SSS a')
+    var s3path = process.env.S3_PATH 
+        .replace("SITE", params.site)
+        .replace("YEAR", date.format('YYYY'));
+    var datestr = date.format('YYYYMMDD-HHmmss');
     var site = params.site;
-    return `${params.site}-${img.type}-${datestr}.gif`;
+    return `${s3path}/${params.site}-${img.type}-${datestr}.gif`;
 };
 
 exports.getS3 = function() {
