@@ -115,7 +115,7 @@ exports.transferImage = function(image_url, bucket, filename) {
                 
                 if(err) {
                     reject(err);
-                    winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) FAILED s3://${bucket}/${filename}`);
+                    winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) FAILED s3://${bucket}/${filename} ERROR: ${err}`);
                 } else {
                     resolve(data);
                     winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) Finished s3://${bucket}/${filename}`);
