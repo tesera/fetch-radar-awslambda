@@ -7,20 +7,10 @@ const url = require('url');
 const querystring = require('querystring');
 const moment = require('moment');
 const winston = require('winston');
-const WinstonCloudWatch = require('winston-cloudwatch');
-
-winston.loggers.add('cloudwatch', {
-    transports: [
-        new WinstonCloudWatch({
-            awsRegion: 'us-east-1',
-            logGroupName: 'lambda-fetch-radar',
-            LogStreamName: moment().format("YYYYMMDD") + '-lambda-fetch-radar',
-        })
-    ]
-});
 
 try {
     require('node-env-file')('.env');
+    if(process.env.LOG_LEVEL) winston.level = process.env.LOG_LEVEL;
 } catch(err) {
     if(err instanceof TypeError && err.message.substring(0,30) == "Environment file doesn't exist") console.log('ERROR: Could not find .env file.');
     else throw err;
@@ -41,6 +31,7 @@ exports.handler = function(event, context) {
 };
 
 exports.getImageURLs = function(site, type, datetime) {
+    winston.info(`Processing SITE=${site} TYPE=${type}`)
     var duration = 12;
     var imageListURL = `http://climate.weather.gc.ca/radar/index_e.html?site=${site}&year=${datetime.getFullYear()}&month=${datetime.getMonth()}&day=${datetime.getDate()}&hour=${datetime.getHours()}&minute=0&duration=${duration}&image_type=${type}`
 
@@ -56,7 +47,7 @@ exports.getImageURLs = function(site, type, datetime) {
                     .filter((s) => { return !s.match(/^\s+$/); })
                     .map((s) => { return /s*'(.*)',/.exec(s)[1]; })
                     .map((url) => { return {type: type, image: url}; })
-                winston.info("Got image list for", {site, type, url: imageListURL, times: blobArray.map((res) => moment(res.image, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss'))});
+                winston.debug("Got image list for", {site, type, url: imageListURL, times: blobArray.map((res) => moment(res.image, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss'))});
                 resolve(blobArray);
             }
         });
@@ -107,7 +98,7 @@ exports.processSite = function(site, types, datetime, bucket) {
 };
 
 exports.transferImage = function(image_url, bucket, filename) {
-    winston.info(`Transferring ${filename} to s3://${bucket}`);
+    winston.debug(`Transferring ${filename} to s3://${bucket}`);
     var image_url = `http://climate.weather.gc.ca${image_url}`;
     return new Promise((resolve, reject) => {
         request(image_url, (error, response, body) => {
