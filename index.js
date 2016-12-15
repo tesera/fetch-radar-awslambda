@@ -128,7 +128,7 @@ exports.transferImage = function(image_url, bucket, filename) {
 };
 
 exports.filenameForImg = function(img) {
-    if(!process.env.S3_PATH) process.env.S3_PATH = 'YEAR/SITE'
+    if(!process.env.S3_PATH) process.env.S3_PATH = 'YEAR/MONTH/SITE'
     var query = url.parse(img['image']).query;
     var params = querystring.parse(query);
     var date = moment(params.time, 'DD-MMM-YY hh.mm.ss.SSS a')
@@ -137,7 +137,7 @@ exports.filenameForImg = function(img) {
         .replace("YEAR", date.format('YYYY'));
     var datestr = date.format('YYYYMMDD-HHmmss');
     var site = params.site;
-    return `${s3path}/${params.site}-${img.type}-${datestr}.gif`;
+    return `${s3path}/${datestr}-${params.site}-${img.type}.gif`;
 };
 
 exports.getS3 = function() {
