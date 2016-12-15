@@ -53,10 +53,11 @@ describe('filenameForImg()', function() {
     });
 
     it('calculates the correct path based on an environment variable', function() {
-        var savedPath = process.env.PATH;
-        process.env.PATH = 'YEAR/YEAR/YEAR'
+        var savedPath = process.env.S3_PATH;
+        process.env.S3_PATH = 'YEAR/YEAR/YEAR'
         var expected = '2015/2015/2015/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif'
         var actual = lambda.filenameForImg(img);
-        process.env.PATH = savedPath;
+        assert.equal(expected, actual);
+        process.env.S3_PATH = savedPath;
     });
 });
