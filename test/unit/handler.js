@@ -24,20 +24,29 @@ describe('handler()', function() {
         var expected = [1381881600,1381881600];
         lambda.stub('processSite', (site, types, datetime) => Promise.resolve(datetime.getTime()/1000));
 
-        return lambda.handler(scheduledEvent).then(actual => assert.deepEqual(actual, expected));
+        return lambda.handler(scheduledEvent, null, (err, actual) => {
+            assert.deepEqual(actual, expected);
+            assert.equal(null, err);
+        });
     });
 
     it('Calls process site for each site requested', function() {
         var expected = [ 'WUJ', 'XSM' ];
         lambda.stub('processSite', (site) => Promise.resolve(site));
 
-        return lambda.handler(scheduledEvent).then((actual) => assert.deepEqual(expected, actual));
+        return lambda.handler(scheduledEvent, null, (err, actual) => {
+            assert.deepEqual(expected, actual);
+            assert.equal(null, err);
+        });
     });
 
     it('Supplies the requested types to processSite', function() {
         var expected = [['PRECIPET_SNOW_WEATHEROFFICE','PRECIP_RAIN_WEATHEROFFICE'],['PRECIPET_SNOW_WEATHEROFFICE','PRECIP_RAIN_WEATHEROFFICE']];
         lambda.stub('processSite', (site, types) => Promise.resolve(types));
 
-        return lambda.handler(scheduledEvent).then((actual) => assert.deepEqual(expected, actual));
+        return lambda.handler(scheduledEvent, null, (err, actual) => {
+            assert.deepEqual(expected, actual);
+            assert.equal(null, err);
+        });
     });
 });

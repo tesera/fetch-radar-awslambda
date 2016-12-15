@@ -134,7 +134,8 @@ exports.filenameForImg = function(img) {
     var date = moment(params.time, 'DD-MMM-YY hh.mm.ss.SSS a')
     var s3path = process.env.S3_PATH 
         .replace("SITE", params.site)
-        .replace("YEAR", date.format('YYYY'));
+        .replace("YEAR", date.format('YYYY'))
+        .replace("MONTH", date.format('MMM'));
     var datestr = date.format('YYYYMMDD-HHmmss');
     var site = params.site;
     return `${s3path}/${datestr}-${params.site}-${img.type}.gif`;

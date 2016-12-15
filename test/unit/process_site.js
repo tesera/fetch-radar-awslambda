@@ -26,12 +26,12 @@ describe('processSite()', function() {
         lambda.stub('transferImage', (img, bucket, filename) => Promise.resolve(filename));
         var expected = [
             [
-                '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif',
-                '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
+                '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif',
+                '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif'
             ],
             [
-                '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif',
-                '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
+                '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif',
+                '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif'
             ]
         ];
 
@@ -48,14 +48,14 @@ describe('filenameForImg()', function() {
 
     it('calculates the correct filename for a supplied img', function() {
         var actual = lambda.filenameForImg(img);
-        var expected = '2015/WUJ/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
+        var expected = '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif'
         assert.equal(expected, actual);
     });
 
     it('calculates the correct path based on an environment variable', function() {
         var savedPath = process.env.PATH;
         process.env.PATH = 'YEAR/YEAR/YEAR'
-        var expected = '2015/2015/2015/WUJ-PRECIPET_SNOW_WEATHEROFFICE-20151017-002333.gif'
+        var expected = '2015/2015/2015/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif'
         var actual = lambda.filenameForImg(img);
         process.env.PATH = savedPath;
     });
