@@ -7,12 +7,13 @@ const url = require('url');
 const querystring = require('querystring');
 const moment = require('moment');
 const winston = require('winston');
+const async = require('async');
 
 try {
     require('node-env-file')('.env');
     if(process.env.LOG_LEVEL) winston.level = process.env.LOG_LEVEL;
 } catch(err) {
-    if(err instanceof TypeError && err.message.substring(0,30) == "Environment file doesn't exist") console.log('ERROR: Could not find .env file.');
+    if(err instanceof TypeError && err.message.substring(0,30) == "Environment file doesn't exist") winston.warn('ERROR: Could not find .env file.');
     else throw err;
 }
 
@@ -56,6 +57,12 @@ exports.getImageURLs = function(site, type, datetime) {
     });
 };
 
+
+exports.transferImageQueue = async.queue(function(task, cb) {
+    exports.transferImage(task['img'], bucket, exports.filenameForImg(task))
+        .then(cb);
+}, process.env.TRANSFER_WORKERS || 5);
+
 exports.processSite = function(site, types, datetime, bucket) {
     var morning = new Date(datetime);
     morning.setHours(0);
@@ -77,15 +84,16 @@ exports.processSite = function(site, types, datetime, bucket) {
             return all_urls; // 1 array of 24 urls
         })
 
-        .then(images => Promise.all(
-            // map the image_url to a request
-            images.map( img => exports.transferImage(img['image'], bucket, exports.filenameForImg(img)) )
-        ))
+        .then((images) => {
+            images.forEach((img) => {
+                exports.transferImageQueue.push(img);
+            });
+        })
         
     ));
   
     function debugAndReturn(thing) {
-        console.log('debug: ', thing);
+        winston.debug('debug: ', thing);
         return thing;
     }
 
@@ -117,7 +125,7 @@ exports.transferImage = function(image_url, bucket, filename) {
                 
                 if(err) {
                     reject(err);
-                    winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) FAILED s3://${bucket}/${filename} ERROR: ${err}`);
+                    winston.error(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) FAILED s3://${bucket}/${filename} ERROR: ${err}`);
                 } else {
                     resolve(data);
                     winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) Finished s3://${bucket}/${filename}`);
