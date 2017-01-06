@@ -124,7 +124,7 @@ exports.transferImage = function(image_url, bucket, filename) {
                     winston.error(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) FAILED s3://${bucket}/${filename} ERROR: ${err}`);
                 } else {
                     resolve(data);
-                    winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) Finished s3://${bucket}/${filename}`);
+                    winston.verbose(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) Finished s3://${bucket}/${filename}`);
                 }
             });
         });
@@ -150,6 +150,6 @@ exports.getS3 = function() {
 };
 
 function debugAndReturn(thing) {
-    winston.verbose(thing);
+    winston.debug(thing);
     return thing;
 }
