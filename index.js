@@ -59,7 +59,7 @@ exports.getImageURLs = function(site, type, datetime) {
 
 
 exports.transferImageQueue = async.queue(function(task, cb) {
-    exports.transferImage(task['img'], bucket, exports.filenameForImg(task))
+    exports.transferImage(task['image'], bucket, exports.filenameForImg(task))
         .then(cb);
 }, process.env.TRANSFER_WORKERS || 5);
 
