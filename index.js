@@ -36,7 +36,7 @@ exports.handler = function(event, context, callback) {
 exports.getImageURLs = function(site, type, datetime) {
     winston.info(`Processing SITE=${site} TYPE=${type}`)
     var duration = 12;
-    var imageListURL = `http://climate.weather.gc.ca/radar/index_e.html?site=${site}&year=${datetime.getFullYear()}&month=${datetime.getMonth()}&day=${datetime.getDate()}&hour=${datetime.getHours()}&minute=0&duration=${duration}&image_type=${type}`
+    var imageListURL = `http://climate.weather.gc.ca/radar/index_e.html?site=${site}&year=${datetime.getFullYear()}&month=${datetime.getMonth()+1}&day=${datetime.getDate()}&hour=${datetime.getHours()}&minute=0&duration=${duration}&image_type=${type}`
 
     return new Promise((resolve, reject) => {
         request(imageListURL, (error, response, body) => {
@@ -49,6 +49,7 @@ exports.getImageURLs = function(site, type, datetime) {
                     .split('\n')
                     .filter((s) => { return !s.match(/^\s+$/); })
                     .map((s) => { return /s*'(.*)',/.exec(s)[1]; })
+                    .map(debugAndReturn)
                     .map((url) => { return {type: type, image: url}; })
                 winston.debug("Got image list for", {site, type, url: imageListURL, times: blobArray.map((res) => moment(res.image, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss'))});
                 resolve(blobArray);
@@ -91,11 +92,6 @@ exports.processSite = function(site, types, datetime, bucket) {
         })
         
     ));
-  
-    function debugAndReturn(thing) {
-        winston.debug('debug: ', thing);
-        return thing;
-    }
 
     function getSiteUrls(site, type, timeofday) {
         return exports.getImageURLs(site, type, timeofday).catch(errorHandler);
@@ -153,3 +149,7 @@ exports.getS3 = function() {
     return S3;
 };
 
+function debugAndReturn(thing) {
+    winston.verbose(thing);
+    return thing;
+}
