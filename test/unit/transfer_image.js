@@ -12,7 +12,7 @@ describe('transferImage()', function() {
         this.timeout(0);
 
         lambda.stub('getS3', function() {
-            return { putObject: function(args, cb) { cb(null, {ETag: 'asdfasfd'}); } }
+            return { upload: function(args, cb) { cb(null, {ETag: 'asdfasfd'}); } }
         });
 
         lambda.transferImage(image_obj.image, bucket, 'test/WUJ-PRECIPET_SNOW_WEATHEROFFICE-17OCT15_12.23.33').then((actual) => {

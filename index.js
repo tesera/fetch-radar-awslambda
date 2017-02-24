@@ -1,4 +1,3 @@
-
 const AWS = require('aws-sdk');
 const http = require('http');
 const request = require('request');
@@ -111,14 +110,16 @@ exports.transferImage = function(image_url, bucket, filename) {
     this.openTransfers++;
     var image_url = `http://climate.weather.gc.ca${image_url}`;
     return new Promise((resolve, reject) => {
-        request(image_url, (error, response, body) => {
-            exports.getS3().putObject({
+        http.get(image_url, (res) => {
+            var opts = {
                 Bucket: bucket,
                 Key: filename,
-                Body: body
-            }, (err, data) => {
+                Body: res,
+                ContentType: res.headers['content-type']
+            };
+
+            exports.getS3().upload(opts, (err, data) => {
                 this.completedTransfers++;
-                
                 if(err) {
                     reject(err);
                     winston.error(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) FAILED s3://${bucket}/${filename} ERROR: ${err}`);
