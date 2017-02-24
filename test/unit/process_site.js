@@ -49,7 +49,7 @@ describe('filenameForImg()', function() {
 
     it('calculates the correct filename for a supplied img', function() {
         var actual = lambda.filenameForImg(img);
-        var expected = '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif'
+        var expected = '2015-10-17/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif'
         assert.equal(expected, actual);
     });
 
