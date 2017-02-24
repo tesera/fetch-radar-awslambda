@@ -6,7 +6,7 @@ describe('getImageURLs()', function() {
     it('finds and returns the image URLs', function() {
         var site = 'WUJ';
         var type = 'PRECIPET_SNOW_WEATHEROFFICE'
-        var datetime = new Date(2015,10,17,10);
+        var datetime = new Date(2015,9,17,10);
         datetime.setHours(0);
         var expected = [
             { type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ' },
@@ -42,5 +42,17 @@ describe('getImageURLs()', function() {
                 if(message == expected_error) done();
                 else done(`Did not receive expected error.\n\nExpected:\t${expected_error}\nActual: \t${message}\n`);
             })
+    });
+
+    it('#WIP uses index starting at 1 and not zero', function() {
+        // js date uses 0-11 index. Weather Canada uses 1-12.
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMonth
+
+
+    });
+
+    it('#WIP checks that the site code is present in the image URL', function() {
+        // simple sanity check
+
     });
 });

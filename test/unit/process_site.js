@@ -1,7 +1,11 @@
 const assert = require('assert');
 const lambda = require('../test_helper');
 
-beforeEach(() => lambda.unstub());
+var actual;
+beforeEach(() => {
+    actual = [];
+    lambda.unstub()
+});
 
 describe('processSite()', function() {
     var types = ['PRECIPET_SNOW_WEATHEROFFICE','PRECIPET_SNOW_A11Y_WEATHEROFFICE'];
@@ -10,32 +14,29 @@ describe('processSite()', function() {
     var bucket = 'somebucket';
 
     it('Makes a call to getImageURLs for each type for the requested site', function() {
+        lambda.stub('getImageURLs', () => Promise.resolve([{ type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ' }]));
+        lambda.stub('transferImageQueue.push', (obj) => actual.push(obj.image));
         var expected = [
-            [ 'transfer images result', 'transfer images result' ],
-            [ 'transfer images result', 'transfer images result' ]
+            "/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ",
+            "/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ",
+            "/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ",
+            "/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ"
         ];
 
-        lambda.stub('getImageURLs', () => Promise.resolve([{ type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ' }]));
-        lambda.stub('transferImage', () => Promise.resolve("transfer images result"));
-
-        return lambda.processSite(site, types, datetime).then(actual => assert.deepEqual(expected, actual));
+        return lambda.processSite(site, types, datetime).then(result => assert.deepEqual(expected, actual));
     });
 
     it('Calls transfer image for each image returned from getImageURLs', function(done) {
         lambda.stub('getImageURLs', () => Promise.resolve([{ type: 'PRECIPET_SNOW_WEATHEROFFICE', image: '/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ' }]));
-        lambda.stub('transferImage', (img, bucket, filename) => Promise.resolve(filename));
+        lambda.stub('transferImageQueue.push', (obj) => actual.push(obj.image));
         var expected = [
-            [
-                '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif',
-                '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif'
-            ],
-            [
-                '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif',
-                '2015/Oct/WUJ/20151017-002333-WUJ-PRECIPET_SNOW_WEATHEROFFICE.gif'
-            ]
+            "/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ",
+            "/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ",
+            "/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ",
+            "/lib/radar/image.php?time=17-OCT-15+12.23.33.962333+AM&site=WUJ"
         ];
 
-        lambda.processSite(site, types, datetime).then((actual) => {
+        lambda.processSite(site, types, datetime).then((result) => {
             assert.deepEqual(expected, actual);
             done();
         })

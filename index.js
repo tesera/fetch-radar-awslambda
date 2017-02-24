@@ -7,12 +7,13 @@ const url = require('url');
 const querystring = require('querystring');
 const moment = require('moment');
 const winston = require('winston');
+const async = require('async');
 
 try {
     require('node-env-file')('.env');
     if(process.env.LOG_LEVEL) winston.level = process.env.LOG_LEVEL;
 } catch(err) {
-    if(err instanceof TypeError && err.message.substring(0,30) == "Environment file doesn't exist") console.log('ERROR: Could not find .env file.');
+    if(err instanceof TypeError && err.message.substring(0,30) == "Environment file doesn't exist") winston.warn('ERROR: Could not find .env file.');
     else throw err;
 }
 
@@ -35,7 +36,7 @@ exports.handler = function(event, context, callback) {
 exports.getImageURLs = function(site, type, datetime) {
     winston.info(`Processing SITE=${site} TYPE=${type}`)
     var duration = 12;
-    var imageListURL = `http://climate.weather.gc.ca/radar/index_e.html?site=${site}&year=${datetime.getFullYear()}&month=${datetime.getMonth()}&day=${datetime.getDate()}&hour=${datetime.getHours()}&minute=0&duration=${duration}&image_type=${type}`
+    var imageListURL = `http://climate.weather.gc.ca/radar/index_e.html?site=${site}&year=${datetime.getFullYear()}&month=${datetime.getMonth()+1}&day=${datetime.getDate()}&hour=${datetime.getHours()}&minute=0&duration=${duration}&image_type=${type}`
 
     return new Promise((resolve, reject) => {
         request(imageListURL, (error, response, body) => {
@@ -48,6 +49,7 @@ exports.getImageURLs = function(site, type, datetime) {
                     .split('\n')
                     .filter((s) => { return !s.match(/^\s+$/); })
                     .map((s) => { return /s*'(.*)',/.exec(s)[1]; })
+                    .map(debugAndReturn)
                     .map((url) => { return {type: type, image: url}; })
                 winston.debug("Got image list for", {site, type, url: imageListURL, times: blobArray.map((res) => moment(res.image, 'DD-MMM-YY hh.mm.ss.SSS a').format('YYYYMMDD-HHmmss'))});
                 resolve(blobArray);
@@ -55,6 +57,12 @@ exports.getImageURLs = function(site, type, datetime) {
         });
     });
 };
+
+
+exports.transferImageQueue = async.queue(function(task, cb) {
+    exports.transferImage(task['image'], bucket, exports.filenameForImg(task))
+        .then(cb);
+}, process.env.TRANSFER_WORKERS || 5);
 
 exports.processSite = function(site, types, datetime, bucket) {
     var morning = new Date(datetime);
@@ -77,17 +85,13 @@ exports.processSite = function(site, types, datetime, bucket) {
             return all_urls; // 1 array of 24 urls
         })
 
-        .then(images => Promise.all(
-            // map the image_url to a request
-            images.map( img => exports.transferImage(img['image'], bucket, exports.filenameForImg(img)) )
-        ))
+        .then((images) => {
+            images.forEach((img) => {
+                exports.transferImageQueue.push(img);
+            });
+        })
         
     ));
-  
-    function debugAndReturn(thing) {
-        console.log('debug: ', thing);
-        return thing;
-    }
 
     function getSiteUrls(site, type, timeofday) {
         return exports.getImageURLs(site, type, timeofday).catch(errorHandler);
@@ -117,10 +121,10 @@ exports.transferImage = function(image_url, bucket, filename) {
                 
                 if(err) {
                     reject(err);
-                    winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) FAILED s3://${bucket}/${filename} ERROR: ${err}`);
+                    winston.error(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) FAILED s3://${bucket}/${filename} ERROR: ${err}`);
                 } else {
                     resolve(data);
-                    winston.debug(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) Finished s3://${bucket}/${filename}`);
+                    winston.verbose(`(${this.completedTransfers}/${this.openTransfers}/${this.failedTransfers}) Finished s3://${bucket}/${filename} (${image_url})`);
                 }
             });
         });
@@ -145,3 +149,7 @@ exports.getS3 = function() {
     return S3;
 };
 
+function debugAndReturn(thing) {
+    winston.debug(thing);
+    return thing;
+}
