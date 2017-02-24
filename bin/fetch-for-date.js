@@ -14,7 +14,6 @@ if (! ('day' in options)) {
 }
 
 runFor = moment(Sugar.Date.create(options['day'])).format("YYYY-MM-DD")
-console.log("Run for " + runFor);
 
 var event = {
     "account": "123456789012",
